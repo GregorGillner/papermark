@@ -1,6 +1,6 @@
-# Die goldene Dockerfile-Version
+# DER FINALE DOCKERFILE
 
-# 1. Update auf eine neuere Node.js Version
+# 1. Update auf die korrekte Node.js Version
 FROM node:20-alpine
 
 # Set working directory
@@ -12,14 +12,16 @@ COPY package*.json ./
 # Copy the Prisma-Ordner
 COPY prisma ./prisma
 
-# 2. Installiere ALLE Abhängigkeiten und nutze den '--legacy-peer-deps' Flag
+# 2. Installiere ALLE Abhängigkeiten mit dem '--legacy-peer-deps' Flag,
+# um Konflikte zu beheben.
 RUN npm ci --legacy-peer-deps
 
-# Copy application files
+# Copy the rest of the application files
 COPY . .
 
-# Build the application
-RUN npm run build
+# 3. Führe den Build-Prozess mit einer expliziten Speichererhöhung auf 4GB aus,
+# um einen "Silent Crash" durch zu wenig RAM zu verhindern.
+RUN NODE_OPTIONS=--max-old-space-size=4096 npm run build
 
 # Expose the port the app runs on
 EXPOSE 3000
